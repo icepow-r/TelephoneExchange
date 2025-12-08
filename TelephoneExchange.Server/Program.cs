@@ -10,15 +10,10 @@ namespace TelephoneExchange.Server
         {
             Console.WriteLine("=== Мини-АТС Сервер ===");
             
-            // Создать экземпляр АТС
             var ats = new MiniATS();
-            
-            // Загрузить конфигурацию
             var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json");
             ats.LoadConfig(configPath);
             
-            // Запустить TCP сервер
-            var port = ats.ServerPort;
             var listener = new TcpListener(IPAddress.Any, ats.ServerPort);
             
             try
@@ -27,7 +22,6 @@ namespace TelephoneExchange.Server
                 Console.WriteLine($"Сервер запущен на порту {ats.ServerPort}");
                 Console.WriteLine("Ожидание подключений...\n");
                 
-                // Обработка Ctrl+C для graceful shutdown
                 Console.CancelKeyPress += (sender, e) =>
                 {
                     e.Cancel = true;
@@ -35,7 +29,6 @@ namespace TelephoneExchange.Server
                     listener.Stop();
                 };
                 
-                // Принимать подключения
                 while (true)
                 {
                     try
@@ -44,7 +37,6 @@ namespace TelephoneExchange.Server
                         var clientEndPoint = client.Client.RemoteEndPoint;
                         Console.WriteLine($"Подключился клиент {clientEndPoint}");
                         
-                        // Создать обработчик для клиента
                         var handler = new ClientHandler(client, ats);
                         handler.StartListening();
                     }
@@ -56,7 +48,7 @@ namespace TelephoneExchange.Server
                         }
                         else
                         {
-                            break; // Сервер остановлен
+                            break;
                         }
                     }
                 }
