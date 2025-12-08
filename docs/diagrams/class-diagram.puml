@@ -1,0 +1,172 @@
+@startuml Диаграмма классов мини-АТС
+
+' Стиль
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "TelephoneExchange.Server" {
+  
+  package "Models" {
+    enum SubscriberState {
+      Idle
+      Ready
+      Busy
+      Dialing
+      Ringing
+      InCall
+    }
+    
+    class Subscriber {
+      + PhoneNumber : string {readonly}
+      + State : SubscriberState
+      + CurrentConnection : Connection?
+      + ClientHandler : ClientHandler
+      --
+      + Subscriber(phoneNumber, clientHandler)
+      + ChangeState(newState : SubscriberState)
+      + CanMakeCall() : bool
+      + CanReceiveCall() : bool
+    }
+    
+    class Connection {
+      + SubscriberA : Subscriber {readonly}
+      + SubscriberB : Subscriber {readonly}
+      + EstablishedAt : DateTime {readonly}
+      --
+      + Connection(subscriberA, subscriberB)
+      + SendMessage(from : Subscriber, message : string)
+      + GetOtherSubscriber(subscriber : Subscriber) : Subscriber?
+      + Disconnect()
+    }
+  }
+  
+  package "Network" {
+    class MiniATS {
+      + MaxConnections : int {readonly}
+      + PhoneNumberLength : int {readonly}
+      - _subscribers : List<Subscriber>
+      - _activeConnections : List<Connection>
+      - _nextPhoneNumber : int
+      --
+      + LoadConfig(configPath : string)
+      - GeneratePhoneNumber() : string
+      + RegisterSubscriber(handler : ClientHandler)
+      + UnregisterSubscriber(subscriber : Subscriber)
+      + HandlePickup(subscriber : Subscriber)
+      + HandleDial(caller : Subscriber, targetNumber : string)
+      + HandleHangup(subscriber : Subscriber)
+      + HandleMessage(sender : Subscriber, message : string)
+      - CanCreateConnection() : bool
+      - CreateConnection(a : Subscriber, b : Subscriber)
+      - RemoveConnection(connection : Connection)
+      - BroadcastSubscribersList()
+    }
+    
+    class ClientHandler {
+      + TcpClient : TcpClient
+      + NetworkStream : NetworkStream
+      + Subscriber : Subscriber?
+      - _ats : MiniATS
+      - _isRunning : bool
+      --
+      + ClientHandler(tcpClient, ats)
+      + StartListening()
+      + SendMessage(message : string)
+      - ProcessCommand(command : string)
+      + Disconnect()
+    }
+    
+    class ServerConfig {
+      + MaxConnections : int
+      + PhoneNumberLength : int
+      + ServerPort : int
+    }
+  }
+}
+
+package "TelephoneExchange.Client" {
+  
+  package "Models" {
+    class SubscriberInfo {
+      + Number : string
+      + State : string
+      --
+      + ToString() : string
+    }
+  }
+  
+  package "Network" {
+    class PhoneClient {
+      - _tcpClient : TcpClient?
+      - _networkStream : NetworkStream?
+      - _isRunning : bool
+      + IsConnected : bool
+      --
+      + OnAssignedNumber : Action<string>
+      + OnSignalReceived : Action<string>
+      + OnStateChanged : Action<string>
+      + OnIncomingCall : Action<string>
+      + OnCallConnected : Action
+      + OnCallEnded : Action
+      + OnMessageReceived : Action<string>
+      + OnSubscribersListReceived : Action<List<SubscriberInfo>>
+      + OnDisconnected : Action
+      + OnError : Action<string>
+      --
+      + Connect(serverAddress : string, port : int) : Task<bool>
+      + Disconnect()
+      + SendPickup()
+      + SendHangup()
+      + SendDial(number : string)
+      + SendMessage(message : string)
+      - SendCommand(command : string)
+      - StartListening()
+      - ProcessMessage(message : string)
+    }
+  }
+  
+  class MainWindow {
+    - _phoneClient : PhoneClient
+    - _currentState : string
+    --
+    + MainWindow()
+    - SubscribeToEvents()
+    - UpdateButtonStates()
+    - BtnConnect_Click(sender, e)
+    - BtnPickup_Click(sender, e)
+    - BtnHangup_Click(sender, e)
+    - BtnDial_Click(sender, e)
+    - BtnSendMessage_Click(sender, e)
+    - Window_Closing(sender, e)
+  }
+}
+
+' Связи сервера
+MiniATS *-- "0..*" Subscriber : содержит
+MiniATS *-- "0..*" Connection : содержит
+MiniATS -- ServerConfig : использует
+Subscriber --> SubscriberState : использует
+Subscriber -- ClientHandler : связан с
+Subscriber "0..1" -- Connection : участвует в
+Connection "1" -- "2" Subscriber : связывает
+ClientHandler --> MiniATS : обращается к
+
+' Связи клиента
+MainWindow *-- PhoneClient : содержит
+PhoneClient ..> SubscriberInfo : использует
+
+note right of MiniATS
+  Центральный класс сервера.
+  Управляет всеми абонентами,
+  соединениями и обрабатывает
+  события жизненного цикла.
+end note
+
+note bottom of PhoneClient
+  Клиентский класс для
+  взаимодействия с сервером.
+  Использует события для
+  уведомления UI.
+end note
+
+@enduml

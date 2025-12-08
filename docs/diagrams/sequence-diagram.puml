@@ -1,0 +1,85 @@
+@startuml Диаграмма последовательности - Успешный вызов
+
+actor "Абонент A" as ClientA
+participant "Клиент A\n(PhoneClient)" as PhoneA
+participant "Сервер\n(MiniATS)" as Server
+participant "Клиент B\n(PhoneClient)" as PhoneB
+actor "Абонент B" as ClientB
+
+== Подключение ==
+ClientA -> PhoneA: Подключиться
+PhoneA -> Server: CONNECT
+Server -> PhoneA: ASSIGNED:001
+PhoneA -> ClientA: Показать номер 001
+
+ClientB -> PhoneB: Подключиться
+PhoneB -> Server: CONNECT
+Server -> PhoneB: ASSIGNED:002
+PhoneB -> ClientB: Показать номер 002
+
+Server -> PhoneA: SUBSCRIBERS:[001, 002]
+Server -> PhoneB: SUBSCRIBERS:[001, 002]
+
+== Инициация вызова ==
+ClientA -> PhoneA: Снять трубку
+PhoneA -> Server: PICKUP
+Server -> Server: Проверить лимит соединений
+Server -> PhoneA: SIGNAL:готов
+Server -> PhoneA: STATE:Ready
+PhoneA -> ClientA: Отобразить "Готов"
+
+ClientA -> PhoneA: Набрать 002 и позвонить
+PhoneA -> Server: DIAL:002
+Server -> Server: Проверить существование\nи доступность абонента 002
+Server -> PhoneA: STATE:Dialing
+Server -> PhoneB: INCOMING_CALL:001
+Server -> PhoneB: STATE:Ringing
+PhoneB -> ClientB: MessageBox "Входящий вызов от 001"
+
+Server -> PhoneA: SUBSCRIBERS:[001:Dialing, 002:Ringing]
+Server -> PhoneB: SUBSCRIBERS:[001:Dialing, 002:Ringing]
+
+== Установление соединения ==
+ClientB -> PhoneB: Снять трубку
+PhoneB -> Server: PICKUP
+Server -> Server: Создать соединение\n001 <-> 002
+Server -> PhoneA: CALL_CONNECTED
+Server -> PhoneA: STATE:InCall
+PhoneA -> ClientA: Активировать чат
+
+Server -> PhoneB: CALL_CONNECTED
+Server -> PhoneB: STATE:InCall
+PhoneB -> ClientB: Активировать чат
+
+Server -> PhoneA: SUBSCRIBERS:[001:InCall, 002:InCall]
+Server -> PhoneB: SUBSCRIBERS:[001:InCall, 002:InCall]
+
+== Обмен сообщениями ==
+ClientA -> PhoneA: Ввести "Привет" и отправить
+PhoneA -> PhoneA: Отобразить "Я: Привет"
+PhoneA -> Server: MESSAGE:Привет
+Server -> PhoneB: MESSAGE:Привет
+PhoneB -> ClientB: Отобразить "Собеседник: Привет"
+
+ClientB -> PhoneB: Ввести "Привет!" и отправить
+PhoneB -> PhoneB: Отобразить "Я: Привет!"
+PhoneB -> Server: MESSAGE:Привет!
+Server -> PhoneA: MESSAGE:Привет!
+PhoneA -> ClientA: Отобразить "Собеседник: Привет!"
+
+== Завершение вызова ==
+ClientA -> PhoneA: Положить трубку
+PhoneA -> Server: HANGUP
+Server -> Server: Разорвать соединение\n001 <-> 002
+Server -> PhoneA: CALL_ENDED
+Server -> PhoneA: STATE:Idle
+PhoneA -> ClientA: Очистить чат,\nдеактивировать поле ввода
+
+Server -> PhoneB: CALL_ENDED
+Server -> PhoneB: STATE:Idle
+PhoneB -> ClientB: Очистить чат,\nдеактивировать поле ввода
+
+Server -> PhoneA: SUBSCRIBERS:[001:Idle, 002:Idle]
+Server -> PhoneB: SUBSCRIBERS:[001:Idle, 002:Idle]
+
+@enduml

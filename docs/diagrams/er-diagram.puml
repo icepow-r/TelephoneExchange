@@ -1,0 +1,47 @@
+@startuml ER-диаграмма мини-АТС
+
+' Стиль
+skinparam linetype ortho
+skinparam roundcorner 10
+
+' Сущности
+entity "АТС (MiniATS)" as ATS {
+  * Максимум соединений : int
+  * Длина номера : int
+  * Порт : int
+}
+
+entity "Абонент (Subscriber)" as Subscriber {
+  * Номер телефона : string <<PK>>
+  --
+  Состояние : SubscriberState
+  IP-адрес клиента : string
+}
+
+entity "Соединение (Connection)" as Connection {
+  * ID : int <<PK>>
+  --
+  Время установления : DateTime
+}
+
+' Связи
+ATS ||--o{ Subscriber : "управляет"
+ATS ||--o{ Connection : "управляет"
+Connection }o--|| Subscriber : "абонент A"
+Connection }o--|| Subscriber : "абонент B"
+
+note right of ATS
+  Центральный компонент системы.
+  Управляет всеми абонентами
+  и их соединениями.
+end note
+
+note bottom of Connection
+  Соединение всегда связывает
+  ровно двух абонентов.
+  Максимальное количество
+  одновременных соединений
+  ограничено параметром АТС.
+end note
+
+@enduml
