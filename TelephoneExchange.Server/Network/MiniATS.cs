@@ -16,7 +16,7 @@ namespace TelephoneExchange.Server.Network
         private readonly List<Subscriber> _subscribers = new();
         private readonly List<Connection> _activeConnections = new();
         private int _nextPhoneNumber = 1;
-        private readonly object _lock = new();
+        private readonly Lock _lock = new();
 
         /// <summary>
         /// Загрузить конфигурацию из JSON файла
