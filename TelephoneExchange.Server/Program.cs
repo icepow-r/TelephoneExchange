@@ -18,13 +18,13 @@ namespace TelephoneExchange.Server
             ats.LoadConfig(configPath);
             
             // Запустить TCP сервер
-            var port = 5000; // Можно читать из конфигурации
-            var listener = new TcpListener(IPAddress.Any, port);
+            var port = ats.ServerPort;
+            var listener = new TcpListener(IPAddress.Any, ats.ServerPort);
             
             try
             {
                 listener.Start();
-                Console.WriteLine($"Сервер запущен на порту {port}");
+                Console.WriteLine($"Сервер запущен на порту {ats.ServerPort}");
                 Console.WriteLine("Ожидание подключений...\n");
                 
                 // Обработка Ctrl+C для graceful shutdown

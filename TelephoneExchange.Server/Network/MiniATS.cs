@@ -11,6 +11,8 @@ namespace TelephoneExchange.Server.Network
         public int MaxConnections { get; private set; }
         public int PhoneNumberLength { get; private set; }
         
+        public int ServerPort { get; private set; }
+        
         private readonly List<Subscriber> _subscribers = new();
         private readonly List<Connection> _activeConnections = new();
         private int _nextPhoneNumber = 1;
@@ -30,6 +32,7 @@ namespace TelephoneExchange.Server.Network
                 {
                     MaxConnections = config.MaxConnections;
                     PhoneNumberLength = config.PhoneNumberLength;
+                    ServerPort = config.ServerPort;
                     Console.WriteLine($"Конфигурация загружена: MaxConnections={MaxConnections}, PhoneNumberLength={PhoneNumberLength}");
                 }
             }
