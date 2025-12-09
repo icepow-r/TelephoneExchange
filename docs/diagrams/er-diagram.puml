@@ -7,6 +7,7 @@ skinparam roundcorner 10
 ' Сущности
 entity "АТС (MiniATS)" as ATS {
   * Максимум соединений : int
+  * Максимум абонентов : int
   * Длина номера : int
   * Порт : int
 }
@@ -19,7 +20,8 @@ entity "Абонент (Subscriber)" as Subscriber {
 }
 
 entity "Соединение (Connection)" as Connection {
-  * ID : int <<PK>>
+  * Абонент A : Subscriber <<FK>>
+  * Абонент B : Subscriber <<FK>>
   --
   Время установления : DateTime
 }

@@ -42,11 +42,14 @@ package "TelephoneExchange.Server" {
   
   package "Network" {
     class MiniATS {
-      + MaxConnections : int {readonly}
-      + PhoneNumberLength : int {readonly}
+      + MaxConnections : int
+      + MaxSubscribers : int
+      + PhoneNumberLength : int
+      + ServerPort : int
       - _subscribers : List<Subscriber>
       - _activeConnections : List<Connection>
       - _nextPhoneNumber : int
+      - _lock : Lock
       --
       + LoadConfig(configPath : string)
       - GeneratePhoneNumber() : string
@@ -78,6 +81,7 @@ package "TelephoneExchange.Server" {
     
     class ServerConfig {
       + MaxConnections : int
+      + MaxSubscribers : int
       + PhoneNumberLength : int
       + ServerPort : int
     }
@@ -102,16 +106,16 @@ package "TelephoneExchange.Client" {
       - _isRunning : bool
       + IsConnected : bool
       --
-      + OnAssignedNumber : Action<string>
-      + OnSignalReceived : Action<string>
-      + OnStateChanged : Action<string>
-      + OnIncomingCall : Action<string>
-      + OnCallConnected : Action
-      + OnCallEnded : Action
-      + OnMessageReceived : Action<string>
-      + OnSubscribersListReceived : Action<List<SubscriberInfo>>
-      + OnDisconnected : Action
-      + OnError : Action<string>
+      + OnAssignedNumber : event Action<string>?
+      + OnSignalReceived : event Action<string>?
+      + OnStateChanged : event Action<string>?
+      + OnIncomingCall : event Action<string>?
+      + OnCallConnected : event Action?
+      + OnCallEnded : event Action?
+      + OnMessageReceived : event Action<string>?
+      + OnSubscribersListReceived : event Action<List<SubscriberInfo>>?
+      + OnDisconnected : event Action?
+      + OnError : event Action<string>?
       --
       + Connect(serverAddress : string, port : int) : Task<bool>
       + Disconnect()
@@ -128,6 +132,7 @@ package "TelephoneExchange.Client" {
   class MainWindow {
     - _phoneClient : PhoneClient
     - _currentState : string
+    - _subscriberB : string
     --
     + MainWindow()
     - SubscribeToEvents()

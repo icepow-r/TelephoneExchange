@@ -25,34 +25,34 @@ ClientA -> PhoneA: Снять трубку
 PhoneA -> Server: PICKUP
 Server -> Server: Проверить лимит соединений
 Server -> PhoneA: SIGNAL:готов
-Server -> PhoneA: STATE:Ready
-PhoneA -> ClientA: Отобразить "Готов"
+Server -> PhoneA: STATE:Готов
+PhoneA -> ClientA: Отобразить состояние "Готов"
 
 ClientA -> PhoneA: Набрать 002 и позвонить
 PhoneA -> Server: DIAL:002
 Server -> Server: Проверить существование\nи доступность абонента 002
-Server -> PhoneA: STATE:Dialing
+Server -> PhoneA: STATE:Набор номера
 Server -> PhoneB: INCOMING_CALL:001
-Server -> PhoneB: STATE:Ringing
+Server -> PhoneB: STATE:Входящий вызов
 PhoneB -> ClientB: MessageBox "Входящий вызов от 001"
 
-Server -> PhoneA: SUBSCRIBERS:[001:Dialing, 002:Ringing]
-Server -> PhoneB: SUBSCRIBERS:[001:Dialing, 002:Ringing]
+Server -> PhoneA: SUBSCRIBERS:[001:Набор номера, 002:Входящий вызов]
+Server -> PhoneB: SUBSCRIBERS:[001:Набор номера, 002:Входящий вызов]
 
 == Установление соединения ==
 ClientB -> PhoneB: Снять трубку
 PhoneB -> Server: PICKUP
 Server -> Server: Создать соединение\n001 <-> 002
 Server -> PhoneA: CALL_CONNECTED
-Server -> PhoneA: STATE:InCall
+Server -> PhoneA: STATE:В разговоре
 PhoneA -> ClientA: Активировать чат
 
 Server -> PhoneB: CALL_CONNECTED
-Server -> PhoneB: STATE:InCall
+Server -> PhoneB: STATE:В разговоре
 PhoneB -> ClientB: Активировать чат
 
-Server -> PhoneA: SUBSCRIBERS:[001:InCall, 002:InCall]
-Server -> PhoneB: SUBSCRIBERS:[001:InCall, 002:InCall]
+Server -> PhoneA: SUBSCRIBERS:[001:В разговоре, 002:В разговоре]
+Server -> PhoneB: SUBSCRIBERS:[001:В разговоре, 002:В разговоре]
 
 == Обмен сообщениями ==
 ClientA -> PhoneA: Ввести "Привет" и отправить
@@ -72,14 +72,14 @@ ClientA -> PhoneA: Положить трубку
 PhoneA -> Server: HANGUP
 Server -> Server: Разорвать соединение\n001 <-> 002
 Server -> PhoneA: CALL_ENDED
-Server -> PhoneA: STATE:Idle
+Server -> PhoneA: STATE:Ожидание
 PhoneA -> ClientA: Очистить чат,\nдеактивировать поле ввода
 
 Server -> PhoneB: CALL_ENDED
-Server -> PhoneB: STATE:Idle
+Server -> PhoneB: STATE:Ожидание
 PhoneB -> ClientB: Очистить чат,\nдеактивировать поле ввода
 
-Server -> PhoneA: SUBSCRIBERS:[001:Idle, 002:Idle]
-Server -> PhoneB: SUBSCRIBERS:[001:Idle, 002:Idle]
+Server -> PhoneA: SUBSCRIBERS:[001:Ожидание, 002:Ожидание]
+Server -> PhoneB: SUBSCRIBERS:[001:Ожидание, 002:Ожидание]
 
 @enduml
