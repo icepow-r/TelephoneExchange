@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace TelephoneExchange.Client.Models
 {
     /// <summary>
@@ -5,7 +7,9 @@ namespace TelephoneExchange.Client.Models
     /// </summary>
     public class SubscriberInfo
     {
+        [JsonPropertyName("number")]
         public string Number { get; set; } = string.Empty;
+        [JsonPropertyName("state")]
         public string State { get; set; } = string.Empty;
 
         public override string ToString()
