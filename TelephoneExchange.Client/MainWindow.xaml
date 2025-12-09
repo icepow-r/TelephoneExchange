@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:TelephoneExchange.Client"
         mc:Ignorable="d"
         Title="Телефон - Мини-АТС" Height="600" Width="900"
+        MinWidth="800"
         Closing="Window_Closing">
     <Grid Margin="10">
         <Grid.RowDefinitions>
