@@ -1,5 +1,6 @@
 {
-  "MaxConnections": 4,
+  "MaxConnections": 2,
+  "MaxSubscribers": 3,
   "PhoneNumberLength": 1,
   "ServerPort": 5000
 }

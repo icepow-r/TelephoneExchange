@@ -9,8 +9,8 @@ namespace TelephoneExchange.Server.Network
     public class MiniATS
     {
         public int MaxConnections { get; private set; }
+        public int MaxSubscribers { get; private set; }
         public int PhoneNumberLength { get; private set; }
-        
         public int ServerPort { get; private set; }
         
         private readonly List<Subscriber> _subscribers = new();
@@ -31,6 +31,7 @@ namespace TelephoneExchange.Server.Network
                 if (config != null)
                 {
                     MaxConnections = config.MaxConnections;
+                    MaxSubscribers = config.MaxSubscribers < (int)Math.Pow(10, config.PhoneNumberLength) ? config.MaxSubscribers : (int)Math.Pow(10, config.PhoneNumberLength);
                     PhoneNumberLength = config.PhoneNumberLength;
                     ServerPort = config.ServerPort;
                     Console.WriteLine($"Конфигурация загружена: MaxConnections={MaxConnections}, PhoneNumberLength={PhoneNumberLength}");
@@ -41,7 +42,9 @@ namespace TelephoneExchange.Server.Network
                 Console.WriteLine($"Ошибка загрузки конфигурации: {ex.Message}");
                 // Значения по умолчанию
                 MaxConnections = 4;
+                MaxSubscribers = 2;
                 PhoneNumberLength = 3;
+                ServerPort = 5000;
             }
         }
 
@@ -53,7 +56,7 @@ namespace TelephoneExchange.Server.Network
             lock (_lock)
             {
                 var number = _nextPhoneNumber.ToString().PadLeft(PhoneNumberLength, '0');
-                _nextPhoneNumber++;
+                _nextPhoneNumber = (_nextPhoneNumber + 1) % (int)Math.Pow(10, PhoneNumberLength);
                 return number;
             }
         }
@@ -65,6 +68,13 @@ namespace TelephoneExchange.Server.Network
         {
             lock (_lock)
             {
+                if (_subscribers.Count >= MaxSubscribers)
+                {
+                    handler.SendMessage($"ERROR:Превышено максимальное количество подключений");
+                    handler.Disconnect();
+                    return;
+                }
+
                 var phoneNumber = GeneratePhoneNumber();
                 var subscriber = new Subscriber(phoneNumber, handler);
                 handler.Subscriber = subscriber;
@@ -300,6 +310,7 @@ namespace TelephoneExchange.Server.Network
     public class ServerConfig
     {
         public int MaxConnections { get; set; }
+        public int MaxSubscribers { get; set; }
         public int PhoneNumberLength { get; set; }
         public int ServerPort { get; set; }
     }
