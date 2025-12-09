@@ -54,9 +54,6 @@
                     <Button x:Name="btnDial" Content="Позвонить" Margin="0,5" Click="BtnDial_Click" IsEnabled="False"/>
 
                     <Separator Margin="0,10"/>
-
-                    <Label Content="Сигнал:"/>
-                    <TextBlock x:Name="txtSignal" Text="-" Margin="5" FontStyle="Italic"/>
                 </StackPanel>
             </Border>
 

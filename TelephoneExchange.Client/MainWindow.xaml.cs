@@ -32,14 +32,6 @@ public partial class MainWindow : Window
             });
         };
 
-        _phoneClient.OnSignalReceived += signal =>
-        {
-            Dispatcher.Invoke(() =>
-            {
-                txtSignal.Text = signal;
-            });
-        };
-
         _phoneClient.OnStateChanged += state =>
         {
             Dispatcher.Invoke(() =>
