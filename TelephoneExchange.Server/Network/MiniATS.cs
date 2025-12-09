@@ -71,7 +71,7 @@ namespace TelephoneExchange.Server.Network
                 _subscribers.Add(subscriber);
                 
                 handler.SendMessage($"ASSIGNED:{phoneNumber}");
-                handler.SendMessage($"STATE:{subscriber.State}");
+                handler.SendMessage($"STATE:{subscriber.State.GetDescription()}");
                 
                 Console.WriteLine($"Абоненту присвоен номер {phoneNumber}");
                 
@@ -126,10 +126,10 @@ namespace TelephoneExchange.Server.Network
                         caller.ChangeState(SubscriberState.InCall);
                         
                         subscriber.ClientHandler.SendMessage("CALL_CONNECTED");
-                        subscriber.ClientHandler.SendMessage($"STATE:{subscriber.State}");
+                        subscriber.ClientHandler.SendMessage($"STATE:{subscriber.State.GetDescription()}");
                         
                         caller.ClientHandler.SendMessage("CALL_CONNECTED");
-                        caller.ClientHandler.SendMessage($"STATE:{caller.State}");
+                        caller.ClientHandler.SendMessage($"STATE:{caller.State.GetDescription()}");
                         
                         Console.WriteLine($"Соединение установлено: {caller.PhoneNumber} <-> {subscriber.PhoneNumber}");
                         
@@ -143,13 +143,13 @@ namespace TelephoneExchange.Server.Network
                 {
                     subscriber.ChangeState(SubscriberState.Busy);
                     subscriber.ClientHandler.SendMessage("SIGNAL:занято");
-                    subscriber.ClientHandler.SendMessage($"STATE:{subscriber.State}");
+                    subscriber.ClientHandler.SendMessage($"STATE:{subscriber.State.GetDescription()}");
                 }
                 else
                 {
                     subscriber.ChangeState(SubscriberState.Ready);
                     subscriber.ClientHandler.SendMessage("SIGNAL:готов");
-                    subscriber.ClientHandler.SendMessage($"STATE:{subscriber.State}");
+                    subscriber.ClientHandler.SendMessage($"STATE:{subscriber.State.GetDescription()}");
                 }
                 
                 BroadcastSubscribersList();
@@ -203,7 +203,7 @@ namespace TelephoneExchange.Server.Network
                 else
                 {
                     subscriber.ChangeState(SubscriberState.Idle);
-                    subscriber.ClientHandler.SendMessage($"STATE:{subscriber.State}");
+                    subscriber.ClientHandler.SendMessage($"STATE:{subscriber.State.GetDescription()}");
                     BroadcastSubscribersList();
                 }
             }
@@ -245,9 +245,9 @@ namespace TelephoneExchange.Server.Network
             caller.ChangeState(SubscriberState.Dialing);
             target.ChangeState(SubscriberState.Ringing);
             
-            caller.ClientHandler.SendMessage($"STATE:{caller.State}");
+            caller.ClientHandler.SendMessage($"STATE:{caller.State.GetDescription()}");
             target.ClientHandler.SendMessage($"INCOMING_CALL:{caller.PhoneNumber}");
-            target.ClientHandler.SendMessage($"STATE:{target.State}");
+            target.ClientHandler.SendMessage($"STATE:{target.State.GetDescription()}");
             
             Console.WriteLine($"Вызов: {caller.PhoneNumber} -> {target.PhoneNumber}");
             
@@ -263,10 +263,10 @@ namespace TelephoneExchange.Server.Network
             _activeConnections.Remove(connection);
             
             connection.SubscriberA.ClientHandler.SendMessage("CALL_ENDED");
-            connection.SubscriberA.ClientHandler.SendMessage($"STATE:{connection.SubscriberA.State}");
+            connection.SubscriberA.ClientHandler.SendMessage($"STATE:{connection.SubscriberA.State.GetDescription()}");
             
             connection.SubscriberB.ClientHandler.SendMessage("CALL_ENDED");
-            connection.SubscriberB.ClientHandler.SendMessage($"STATE:{connection.SubscriberB.State}");
+            connection.SubscriberB.ClientHandler.SendMessage($"STATE:{connection.SubscriberB.State.GetDescription()}");
             
             Console.WriteLine($"Соединение разорвано: {connection.SubscriberA.PhoneNumber} <-> {connection.SubscriberB.PhoneNumber}");
             
@@ -281,7 +281,7 @@ namespace TelephoneExchange.Server.Network
             var subscribersList = _subscribers.Select(s => new
             {
                 number = s.PhoneNumber,
-                state = s.State.ToString()
+                state = s.State.GetDescription()
             }).ToList();
             
             var json = JsonSerializer.Serialize(subscribersList);

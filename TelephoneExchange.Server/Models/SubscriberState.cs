@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace TelephoneExchange.Server.Models
 {
     /// <summary>
@@ -5,34 +7,32 @@ namespace TelephoneExchange.Server.Models
     /// </summary>
     public enum SubscriberState
     {
-        /// <summary>
-        /// Ожидание (трубка положена)
-        /// </summary>
+        [Description("Ожидание")]
         Idle,
-        
-        /// <summary>
-        /// Готов к набору (трубка снята, есть свободные линии)
-        /// </summary>
+
+        [Description("Готов")]
         Ready,
-        
-        /// <summary>
-        /// Занято (трубка снята, нет свободных линий)
-        /// </summary>
+
+        [Description("Занято")]
         Busy,
-        
-        /// <summary>
-        /// Набор номера (трубка снята, набирает номер)
-        /// </summary>
+
+        [Description("Набор номера")] 
         Dialing,
-        
-        /// <summary>
-        /// Входящий вызов (кто-то звонит этому абоненту)
-        /// </summary>
+
+        [Description("Входящий вызов")] 
         Ringing,
-        
-        /// <summary>
-        /// В разговоре (соединение установлено)
-        /// </summary>
+
+        [Description("В разговоре")] 
         InCall
+    }
+
+    public static class EnumExtensions
+    {
+        public static string GetDescription(this Enum value)
+        {
+            var field = value.GetType().GetField(value.ToString());
+            var attribute = Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) as DescriptionAttribute;
+            return attribute?.Description ?? value.ToString();
+        }
     }
 }

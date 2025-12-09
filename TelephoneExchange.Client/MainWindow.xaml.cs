@@ -10,7 +10,8 @@ namespace TelephoneExchange.Client;
 public partial class MainWindow : Window
 {
     private PhoneClient _phoneClient;
-    private string _currentState = "Idle";
+    private string _currentState = "Ожидание";
+    private string _subscriberB = "";
 
     public MainWindow()
     {
@@ -48,6 +49,7 @@ public partial class MainWindow : Window
             {
                 MessageBox.Show($"Входящий вызов от {number}", "Входящий вызов", 
                     MessageBoxButton.OK, MessageBoxImage.Information);
+                _subscriberB = number;
             });
         };
 
@@ -76,7 +78,7 @@ public partial class MainWindow : Window
         {
             Dispatcher.Invoke(() =>
             {
-                txtChatHistory.AppendText($"Собеседник: {message}\n");
+                txtChatHistory.AppendText($"Абонент {_subscriberB}: {message}\n");
                 txtChatHistory.ScrollToEnd();
             });
         };
@@ -97,10 +99,13 @@ public partial class MainWindow : Window
         {
             Dispatcher.Invoke(() =>
             {
-                txtConnectionStatus.Text = "Отключен";
+                txtConnectionStatus.Text = "отключен";
                 txtConnectionStatus.Foreground = System.Windows.Media.Brushes.Red;
                 btnConnect.Content = "Подключиться";
                 txtServerAddress.IsEnabled = true;
+                lstSubscribers.Items.Clear();
+                txtMyNumber.Text = "-";
+                txtMyState.Text = "-";
                 UpdateButtonStates();
             });
         };
@@ -121,11 +126,11 @@ public partial class MainWindow : Window
     {
         bool isConnected = _phoneClient.IsConnected;
         
-        btnPickup.IsEnabled = isConnected && (_currentState == "Idle" || _currentState == "Ringing");
-        btnHangup.IsEnabled = isConnected && (_currentState == "Ready" || _currentState == "Ringing" || 
-                                               _currentState == "InCall" || _currentState == "Dialing" || 
-                                               _currentState == "Busy");
-        btnDial.IsEnabled = isConnected && _currentState == "Ready";
+        btnPickup.IsEnabled = isConnected && (_currentState == "Ожидание" || _currentState == "Входящий вызов");
+        btnHangup.IsEnabled = isConnected && (_currentState == "Готов" || _currentState == "Входящий вызов" || 
+                                               _currentState == "В разговоре" || _currentState == "Набор номера" || 
+                                               _currentState == "Занято");
+        btnDial.IsEnabled = isConnected && _currentState == "Готов";
     }
 
     private async void BtnConnect_Click(object sender, RoutedEventArgs e)
@@ -146,7 +151,7 @@ public partial class MainWindow : Window
             
             if (connected)
             {
-                txtConnectionStatus.Text = "Подключен";
+                txtConnectionStatus.Text = "подключен";
                 txtConnectionStatus.Foreground = System.Windows.Media.Brushes.Green;
                 btnConnect.Content = "Отключиться";
                 txtServerAddress.IsEnabled = false;
