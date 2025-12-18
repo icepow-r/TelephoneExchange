@@ -2,7 +2,7 @@
 
 actor "Абонент A" as ClientA
 participant "Клиент A\n(PhoneClient)" as PhoneA
-participant "Сервер\n(MiniATS)" as Server
+participant "Сервер\n(ATS)" as Server
 participant "Клиент B\n(PhoneClient)" as PhoneB
 actor "Абонент B" as ClientB
 

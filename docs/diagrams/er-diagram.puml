@@ -1,11 +1,11 @@
-@startuml ER-диаграмма мини-АТС
+@startuml ER-диаграмма АТС
 
 ' Стиль
 skinparam linetype ortho
 skinparam roundcorner 10
 
 ' Сущности
-entity "АТС (MiniATS)" as ATS {
+entity "АТС (ATS)" as ATS {
   * Максимум соединений : int
   * Максимум абонентов : int
   * Длина номера : int

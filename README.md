@@ -1,6 +1,6 @@
-# Telephone Exchange System (Мини-АТС)
+# Telephone Exchange System (АТС)
 
-Клиент-серверная система симуляции телефонной мини-АТС на C# с WPF интерфейсом.
+Клиент-серверная система симуляции телефонной АТС на C# с WPF интерфейсом.
 
 ## Описание
 
@@ -17,7 +17,7 @@
 TelephoneExchange/
 ├── TelephoneExchange.Server/    # Серверное консольное приложение
 │   ├── Models/                  # Модели данных (Subscriber, Connection)
-│   ├── Network/                 # Сетевая логика (MiniATS, ClientHandler)
+│   ├── Network/                 # Сетевая логика (ATS, ClientHandler)
 │   └── config.json             # Конфигурация сервера
 ├── TelephoneExchange.Client/    # Клиентское WPF приложение
 │   ├── Models/                  # Модели данных (SubscriberInfo)

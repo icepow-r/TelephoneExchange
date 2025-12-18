@@ -1,4 +1,4 @@
-@startuml Диаграмма классов мини-АТС
+@startuml Диаграмма классов АТС
 
 ' Стиль
 skinparam classAttributeIconSize 0
@@ -41,7 +41,7 @@ package "TelephoneExchange.Server" {
   }
   
   package "Network" {
-    class MiniATS {
+    class ATS {
       + MaxConnections : int
       + MaxSubscribers : int
       + PhoneNumberLength : int
@@ -69,7 +69,7 @@ package "TelephoneExchange.Server" {
       + TcpClient : TcpClient
       + NetworkStream : NetworkStream
       + Subscriber : Subscriber?
-      - _ats : MiniATS
+      - _ats : ATS
       - _isRunning : bool
       --
       + ClientHandler(tcpClient, ats)
@@ -147,20 +147,20 @@ package "TelephoneExchange.Client" {
 }
 
 ' Связи сервера
-MiniATS *-- "0..*" Subscriber : содержит
-MiniATS *-- "0..*" Connection : содержит
-MiniATS -- ServerConfig : использует
+ATS *-- "0..*" Subscriber : содержит
+ATS *-- "0..*" Connection : содержит
+ATS -- ServerConfig : использует
 Subscriber --> SubscriberState : использует
 Subscriber -- ClientHandler : связан с
 Subscriber "0..1" -- Connection : участвует в
 Connection "1" -- "2" Subscriber : связывает
-ClientHandler --> MiniATS : обращается к
+ClientHandler --> ATS : обращается к
 
 ' Связи клиента
 MainWindow *-- PhoneClient : содержит
 PhoneClient ..> SubscriberInfo : использует
 
-note right of MiniATS
+note right of ATS
   Центральный класс сервера.
   Управляет всеми абонентами,
   соединениями и обрабатывает
