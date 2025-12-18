@@ -4,9 +4,9 @@ using TelephoneExchange.Server.Models;
 namespace TelephoneExchange.Server.Network
 {
     /// <summary>
-    /// Ядро системы мини-АТС
+    /// Ядро системы АТС
     /// </summary>
-    public class MiniATS
+    public class ATS
     {
         public int MaxConnections { get; private set; }
         public int MaxSubscribers { get; private set; }

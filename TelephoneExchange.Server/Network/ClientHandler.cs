@@ -13,10 +13,10 @@ namespace TelephoneExchange.Server.Network
         public NetworkStream NetworkStream { get; }
         public Subscriber? Subscriber { get; set; }
         
-        private readonly MiniATS _ats;
+        private readonly ATS _ats;
         private bool _isRunning;
 
-        public ClientHandler(TcpClient tcpClient, MiniATS ats)
+        public ClientHandler(TcpClient tcpClient, ATS ats)
         {
             TcpClient = tcpClient;
             NetworkStream = tcpClient.GetStream();

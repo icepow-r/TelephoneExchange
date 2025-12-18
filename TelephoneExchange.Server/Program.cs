@@ -8,9 +8,9 @@ namespace TelephoneExchange.Server
     {
         static async Task Main(string[] args)
         {
-            Console.WriteLine("=== Мини-АТС Сервер ===");
+            Console.WriteLine("=== АТС Сервер ===");
             
-            var ats = new MiniATS();
+            var ats = new ATS();
             var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json");
             ats.LoadConfig(configPath);
             
